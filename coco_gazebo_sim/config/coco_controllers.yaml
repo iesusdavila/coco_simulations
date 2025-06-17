@@ -24,6 +24,7 @@ joint_trajectory_controller:
       - joint_10
       - joint_11
       - joint_12
+      - joint_13
     
     command_interfaces: ["position"]
     state_interfaces: ["position", "velocity"] 
