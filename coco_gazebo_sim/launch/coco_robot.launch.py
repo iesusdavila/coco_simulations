@@ -66,6 +66,28 @@ def generate_launch_description():
         output='screen'
     )
 
+    usb_cam = Node(
+        package="usb_cam",
+        executable="usb_cam_node_exe",
+        name="usb_cam_node_exe",
+        output="screen",
+    )
+
+    rviz_file = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        output='screen',
+        arguments=['-d', os.path.join(pkg_share, 'config', 'coco.rviz')]
+    )
+
+    face_screen = Node(
+        package="coco_face_screen",
+        executable="face_screen",
+        name="face_screen",
+        output="screen",
+    )
+
     return LaunchDescription([
         # Launch gazebo environment
         IncludeLaunchDescription(
@@ -89,6 +111,9 @@ def generate_launch_description():
         bridge,
         node_robot_state_publisher,
         gz_spawn_entity,
+        usb_cam,
+        rviz_file,
+        face_screen,
         # Launch Arguments
         DeclareLaunchArgument(
             'use_sim_time',
