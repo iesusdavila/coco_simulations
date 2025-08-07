@@ -5,8 +5,8 @@ from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 import os
 from launch.actions import RegisterEventHandler
-from launch.event_handlers import OnProcessExit
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.event_handlers import OnProcessExit, OnProcessStart
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, TimerAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
 
@@ -96,6 +96,7 @@ def generate_launch_description():
                                        'launch',
                                        'gz_sim.launch.py'])]),
             launch_arguments=[('gz_args', [gz_args, ' -r -v 1 empty.sdf'])]),
+        gz_spawn_entity,
         RegisterEventHandler(
             event_handler=OnProcessExit(
                 target_action=gz_spawn_entity,
@@ -108,12 +109,31 @@ def generate_launch_description():
                 on_exit=[joint_trajectory_controller_spawner],
             )
         ),
+        RegisterEventHandler(
+            OnProcessStart(
+                target_action=usb_cam,
+                on_start=[
+                    TimerAction(
+                        period=1.0,
+                        actions=[rviz_file]
+                    )
+                ]
+            ),
+        ),
+        RegisterEventHandler(
+            OnProcessStart(
+                target_action=rviz_file,
+                on_start=[
+                    TimerAction(
+                        period=1.0,
+                        actions=[face_screen]
+                    )
+                ]
+            ),
+        ),
         bridge,
         node_robot_state_publisher,
-        gz_spawn_entity,
         usb_cam,
-        rviz_file,
-        face_screen,
         # Launch Arguments
         DeclareLaunchArgument(
             'use_sim_time',
